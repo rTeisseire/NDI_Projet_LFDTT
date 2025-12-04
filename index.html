@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>SimLycée Responsable</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div id="game">
+    <header>
+      <h1>SimLycée Responsable</h1>
+      <p>Gère le budget de ton lycée et fais monter les jauges NIRD sans te ruiner.</p>
+    </header>
+
+    <section id="stats">
+      <div class="stat">
+        <span>Budget :</span>
+        <span id="budget-value"></span>
+      </div>
+      <div class="gauges">
+        <div class="gauge">
+          <span>Inclusion</span>
+          <div class="bar">
+            <div class="bar-fill" id="gauge-inclusion"></div>
+          </div>
+        </div>
+        <div class="gauge">
+          <span>Responsabilité</span>
+          <div class="bar">
+            <div class="bar-fill" id="gauge-responsabilite"></div>
+          </div>
+        </div>
+        <div class="gauge">
+          <span>Durabilité</span>
+          <div class="bar">
+            <div class="bar-fill" id="gauge-durabilite"></div>
+          </div>
+        </div>
+      </div>
+      <div class="stat">
+        <span>Tour :</span>
+        <span id="tour-value"></span>
+      </div>
+    </section>
+
+    <section id="event">
+      <h2 id="event-title">Clique sur "Commencer" pour lancer la simulation</h2>
+      <p id="event-description"></p>
+      <div id="choices"></div>
+      <p id="feedback"></p>
+      <button id="next-button" class="hidden">Événement suivant</button>
+      <button id="start-button">Commencer</button>
+    </section>
+
+    <section id="end-screen" class="hidden">
+      <h2 id="end-title"></h2>
+      <p id="end-summary"></p>
+      <button id="restart-button">Rejouer</button>
+    </section>
+  </div>
+</body>
+</html>
