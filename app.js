@@ -5,12 +5,13 @@ const initialState = {
   responsabilite: 50,
   durabilite: 50,
   tour: 1,
-  maxTours: 10,
+  maxTours: 10, // 10 tours, 10 événements différents
   gameOver: false
 };
 
 let state = { ...initialState };
 let currentEvent = null;
+let remainingEvents = [];
 
 // --- DOM ---
 const budgetEl = document.getElementById("budget-value");
@@ -140,19 +141,172 @@ const events = [
           "Les pratiques évoluent progressivement et les équipes gagnent en autonomie sur leurs choix numériques."
       }
     ]
+  },
+  {
+    id: "reseaux_sociaux",
+    title: "Groupes sur les réseaux sociaux",
+    description:
+      "Plusieurs profs ont créé des groupes sur un grand réseau social pour communiquer avec leurs classes.",
+    choices: [
+      {
+        text: "Laisser faire, c’est pratique et gratuit.",
+        effects: { budget: 0, inclusion: +5, responsabilite: -15, durabilite: -5 },
+        feedback:
+          "Les élèves suivent mieux l’info, mais leurs données partent chez un acteur privé et tout le monde doit accepter des CGU peu lisibles."
+      },
+      {
+        text: "Basculer vers l’ENT officiel en expliquant les enjeux de protection des données.",
+        effects: { budget: -2000, inclusion: +8, responsabilite: +10, durabilite: +5 },
+        feedback:
+          "La transition demande un effort, mais tu redonnes un cadre plus protecteur et mieux maîtrisé."
+      },
+      {
+        text: "Tester une solution libre de messagerie avec un petit groupe pilote.",
+        effects: { budget: -3000, inclusion: +6, responsabilite: +12, durabilite: +8 },
+        feedback:
+          "Tu avances par petites étapes, tu expérimentes et tu montres qu’il existe des alternatives plus responsables."
+      }
+    ]
+  },
+  {
+    id: "video_streaming",
+    title: "Usage massif de la vidéo",
+    description:
+      "Les enseignants utilisent énormément de vidéos en streaming en classe, ce qui sature la bande passante.",
+    choices: [
+      {
+        text: "Augmenter simplement le débit Internet du lycée.",
+        effects: { budget: -8000, inclusion: +3, responsabilite: 0, durabilite: -8 },
+        feedback:
+          "Tout le monde est content à court terme, mais tu encourages une consommation toujours plus importante de ressources."
+      },
+      {
+        text: "Encourager le téléchargement préalable et la mutualisation des ressources sur un serveur local.",
+        effects: { budget: -4000, inclusion: +5, responsabilite: +5, durabilite: +8 },
+        feedback:
+          "Moins de flux en direct, plus de ressources partagées, un usage plus sobre de la connexion."
+      },
+      {
+        text: "Limiter l’usage de la vidéo à certains cours et proposer plus d’activités hors ligne.",
+        effects: { budget: 0, inclusion: +2, responsabilite: +5, durabilite: +10 },
+        feedback:
+          "Tu réduis l’empreinte environnementale et encourages des approches pédagogiques variées."
+      }
+    ]
+  },
+  {
+    id: "impression",
+    title: "Impressions et photocopies",
+    description:
+      "Les copieurs tournent en permanence, les coûts et l’empreinte environnementale explosent.",
+    choices: [
+      {
+        text: "Racheter des copieurs plus rapides et plus nombreux.",
+        effects: { budget: -15000, inclusion: +2, responsabilite: -3, durabilite: -10 },
+        feedback:
+          "Tu réponds à la demande mais tu encourages un modèle très consommateur de papier."
+      },
+      {
+        text: "Mettre en place un quota d’impression par classe et par utilisateur.",
+        effects: { budget: -2000, inclusion: -2, responsabilite: +5, durabilite: +10 },
+        feedback:
+          "Ça grogne un peu au début, mais les impressions inutiles diminuent fortement."
+      },
+      {
+        text: "Encourager les supports numériques sobres (PDF légers, projection) et mutualiser les impressions essentielles.",
+        effects: { budget: -3000, inclusion: +5, responsabilite: +8, durabilite: +12 },
+        feedback:
+          "Tu réduis la consommation de papier tout en gardant la possibilité d’imprimer quand c’est vraiment nécessaire."
+      }
+    ]
+  },
+  {
+    id: "byod",
+    title: "Apporter son propre appareil (BYOD)",
+    description:
+      "Certains élèves demandent à pouvoir utiliser leur propre ordinateur ou tablette en classe.",
+    choices: [
+      {
+        text: "Autoriser sans cadre précis, chacun fait comme il veut.",
+        effects: { budget: 0, inclusion: -5, responsabilite: -5, durabilite: -2 },
+        feedback:
+          "Les inégalités d’équipement explosent et la sécurité du réseau devient difficile à garantir."
+      },
+      {
+        text: "Refuser totalement, seuls les PC du lycée sont autorisés.",
+        effects: { budget: 0, inclusion: -3, responsabilite: +3, durabilite: +2 },
+        feedback:
+          "C’est plus simple à gérer mais tu ne profites pas des équipements déjà disponibles chez certains élèves."
+      },
+      {
+        text: "Mettre en place un cadre BYOD avec réseau dédié et règles claires.",
+        effects: { budget: -5000, inclusion: +5, responsabilite: +8, durabilite: +5 },
+        feedback:
+          "Tu ouvres la porte aux appareils personnels tout en gardant un environnement plus sécurisé et équitable."
+      }
+    ]
+  },
+  {
+    id: "donnees_evaluations",
+    title: "Outils d’évaluation en ligne",
+    description:
+      "Plusieurs profs veulent utiliser une plateforme américaine très connue pour les quiz et évaluations.",
+    choices: [
+      {
+        text: "Accepter, tout le monde la connaît déjà.",
+        effects: { budget: -1000, inclusion: +5, responsabilite: -12, durabilite: -3 },
+        feedback:
+          "C’est simple à mettre en place, mais les données pédagogiques partent à l’étranger et tu dépends d’un service tiers opaque."
+      },
+      {
+        text: "Proposer une solution libre hébergée par le rectorat ou un partenaire public.",
+        effects: { budget: -3000, inclusion: +5, responsabilite: +12, durabilite: +8 },
+        feedback:
+          "Tu construis une solution plus souveraine, même si la prise en main demande un petit temps d’adaptation."
+      },
+      {
+        text: "Limiter les évaluations en ligne aux usages vraiment nécessaires.",
+        effects: { budget: 0, inclusion: +2, responsabilite: +5, durabilite: +5 },
+        feedback:
+          "Tu gardes un équilibre entre outils numériques et évaluations plus classiques, en réduisant la dépendance aux plateformes."
+      }
+    ]
   }
 ];
+
+// On a maintenant 10 événements : 1 par tour, sans répétition.
+
+// --- OUTILS ---
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function resetEventsPool() {
+  remainingEvents = [...events];
+  shuffleArray(remainingEvents);
+}
 
 // --- FONCTIONS ---
 
 function resetGame() {
   state = { ...initialState };
+  state.gameOver = false;
+  resetEventsPool();
+
   endScreenEl.classList.add("hidden");
   document.getElementById("event").classList.remove("hidden");
   feedbackEl.textContent = "";
   startButton.classList.remove("hidden");
   nextButton.classList.add("hidden");
-  eventTitleEl.textContent = "Clique sur \"Commencer\" pour lancer la simulation";
+  eventTitleEl.textContent = 'Clique sur "Commencer" pour lancer la simulation';
   eventDescriptionEl.textContent = "";
   choicesEl.innerHTML = "";
   updateUI();
@@ -169,24 +323,26 @@ function updateUI() {
   tourEl.textContent = `${state.tour} / ${state.maxTours}`;
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function pickRandomEvent() {
-  const index = Math.floor(Math.random() * events.length);
-  return events[index];
+function pickNextEvent() {
+  if (remainingEvents.length === 0) {
+    console.warn("Plus d'événements disponibles.");
+    return null;
+  }
+  // On prend toujours le premier de la liste mélangée
+  return remainingEvents.shift();
 }
 
 function showEvent() {
-  currentEvent = pickRandomEvent();
+  currentEvent = pickNextEvent();
+  if (!currentEvent) return;
+
   eventTitleEl.textContent = currentEvent.title;
   eventDescriptionEl.textContent = currentEvent.description;
   feedbackEl.textContent = "";
   choicesEl.innerHTML = "";
   nextButton.classList.add("hidden");
 
-  currentEvent.choices.forEach((choice, i) => {
+  currentEvent.choices.forEach((choice) => {
     const btn = document.createElement("button");
     btn.className = "choice-btn";
     btn.textContent = choice.text;
@@ -200,8 +356,10 @@ function handleChoice(choice) {
 
   // désactiver les boutons après le premier clic
   const buttons = document.querySelectorAll(".choice-btn");
-  buttons.forEach((b) => b.classList.add("disabled"));
-  buttons.forEach((b) => (b.disabled = true));
+  buttons.forEach((b) => {
+    b.classList.add("disabled");
+    b.disabled = true;
+  });
 
   // appliquer les effets
   const e = choice.effects;
@@ -243,7 +401,6 @@ function checkEndConditions() {
   }
 
   if (state.tour > state.maxTours) {
-    // calcul du bilan
     const moyenne =
       (state.inclusion + state.responsabilite + state.durabilite) / 3;
     let mention = "";
@@ -293,6 +450,10 @@ function nextTurn() {
 startButton.addEventListener("click", () => {
   startButton.classList.add("hidden");
   state.gameOver = false;
+  // On (re)mélange les événements au démarrage de la partie si besoin
+  if (remainingEvents.length === 0) {
+    resetEventsPool();
+  }
   showEvent();
   updateUI();
 });
@@ -306,5 +467,6 @@ restartButton.addEventListener("click", () => {
   resetGame();
 });
 
-// init affichage
+// init affichage & pool d'événements au chargement
+resetEventsPool();
 updateUI();
