@@ -58,6 +58,23 @@
       <p id="end-summary"></p>
       <button id="restart-button">Rejouer</button>
     </section>
+
+      <!-- Snake caché -->
+    <div id="snake-overlay" class="hidden">
+      <div id="snake-panel">
+        <div class="snake-header">
+          <span>Snake NIRD Edition</span>
+          <button id="snake-close">✕</button>
+        </div>
+        <canvas id="snake-canvas" width="400" height="400"></canvas>
+        <p id="snake-instructions">
+          Utilise les flèches du clavier pour déplacer le serpent.
+          Appuie sur Échap ou sur la croix pour quitter.
+        </p>
+        <p id="snake-score">Score : 0</p>
+      </div>
+    </div>
   </div>
+
 </body>
 </html>

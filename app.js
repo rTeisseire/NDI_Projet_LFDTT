@@ -1,4 +1,4 @@
-// --- ÉTAT DU JEU ---
+// --- ÉTAT DU JEU "SimLycée" ---
 const initialState = {
   budget: 100000,
   inclusion: 50,
@@ -274,9 +274,7 @@ const events = [
   }
 ];
 
-// On a maintenant 10 événements : 1 par tour, sans répétition.
-
-// --- OUTILS ---
+// --- OUTILS GÉNÉRAUX ---
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -294,7 +292,7 @@ function resetEventsPool() {
   shuffleArray(remainingEvents);
 }
 
-// --- FONCTIONS ---
+// --- FONCTIONS "SimLycée" ---
 
 function resetGame() {
   state = { ...initialState };
@@ -328,7 +326,6 @@ function pickNextEvent() {
     console.warn("Plus d'événements disponibles.");
     return null;
   }
-  // On prend toujours le premier de la liste mélangée
   return remainingEvents.shift();
 }
 
@@ -354,21 +351,18 @@ function showEvent() {
 function handleChoice(choice) {
   if (state.gameOver) return;
 
-  // désactiver les boutons après le premier clic
   const buttons = document.querySelectorAll(".choice-btn");
   buttons.forEach((b) => {
     b.classList.add("disabled");
     b.disabled = true;
   });
 
-  // appliquer les effets
   const e = choice.effects;
   state.budget += e.budget;
   state.inclusion += e.inclusion;
   state.responsabilite += e.responsabilite;
   state.durabilite += e.durabilite;
 
-  // clamp des jauges
   state.inclusion = clamp(state.inclusion, 0, 100);
   state.responsabilite = clamp(state.responsabilite, 0, 100);
   state.durabilite = clamp(state.durabilite, 0, 100);
@@ -445,12 +439,11 @@ function nextTurn() {
   updateUI();
 }
 
-// --- LISTENERS ---
+// --- LISTENERS SimLycée ---
 
 startButton.addEventListener("click", () => {
   startButton.classList.add("hidden");
   state.gameOver = false;
-  // On (re)mélange les événements au démarrage de la partie si besoin
   if (remainingEvents.length === 0) {
     resetEventsPool();
   }
@@ -467,6 +460,208 @@ restartButton.addEventListener("click", () => {
   resetGame();
 });
 
-// init affichage & pool d'événements au chargement
+// init
 resetEventsPool();
 updateUI();
+
+/* ------------------------------------------------------------------
+   🐍 SNAKE CACHÉ - Code secret "NIRD"
+------------------------------------------------------------------ */
+
+const snakeOverlay = document.getElementById("snake-overlay");
+const snakeCanvas = document.getElementById("snake-canvas");
+const snakeCtx = snakeCanvas.getContext("2d");
+const snakeCloseBtn = document.getElementById("snake-close");
+const snakeScoreEl = document.getElementById("snake-score");
+
+let snakeActive = false;
+let snakeInterval = null;
+
+const gridSize = 20; // 20x20 cases
+const tileSize = snakeCanvas.width / gridSize;
+
+let snake = [];
+let snakeDir = { x: 1, y: 0 };
+let food = null;
+let snakeScore = 0;
+let pendingDir = null;
+
+// buffer pour le code secret "nird"
+let secretBuffer = "";
+const secretCode = "nird";
+
+function startSnakeGame() {
+  snakeActive = true;
+  snakeOverlay.classList.remove("hidden");
+  initSnake();
+}
+
+function stopSnakeGame() {
+  snakeActive = false;
+  snakeOverlay.classList.add("hidden");
+  if (snakeInterval) {
+    clearInterval(snakeInterval);
+    snakeInterval = null;
+  }
+}
+
+function initSnake() {
+  snake = [
+    { x: 5, y: 10 },
+    { x: 4, y: 10 },
+    { x: 3, y: 10 }
+  ];
+  snakeDir = { x: 1, y: 0 };
+  pendingDir = null;
+  snakeScore = 0;
+  snakeScoreEl.textContent = "Score : 0";
+  placeFood();
+
+  if (snakeInterval) clearInterval(snakeInterval);
+  snakeInterval = setInterval(updateSnake, 120);
+  drawSnake();
+}
+
+function placeFood() {
+  let valid = false;
+  while (!valid) {
+    const fx = Math.floor(Math.random() * gridSize);
+    const fy = Math.floor(Math.random() * gridSize);
+    if (!snake.some((seg) => seg.x === fx && seg.y === fy)) {
+      food = { x: fx, y: fy };
+      valid = true;
+    }
+  }
+}
+
+function updateSnake() {
+  if (!snakeActive) return;
+
+  if (pendingDir) {
+    snakeDir = pendingDir;
+    pendingDir = null;
+  }
+
+  const head = snake[0];
+  const newHead = { x: head.x + snakeDir.x, y: head.y + snakeDir.y };
+
+  // collisions bord
+  if (
+    newHead.x < 0 ||
+    newHead.x >= gridSize ||
+    newHead.y < 0 ||
+    newHead.y >= gridSize
+  ) {
+    gameOverSnake();
+    return;
+  }
+
+  // collisions corps
+  if (snake.some((seg) => seg.x === newHead.x && seg.y === newHead.y)) {
+    gameOverSnake();
+    return;
+  }
+
+  snake.unshift(newHead);
+
+  // manger la nourriture
+  if (food && newHead.x === food.x && newHead.y === food.y) {
+    snakeScore += 1;
+    snakeScoreEl.textContent = "Score : " + snakeScore;
+    placeFood();
+  } else {
+    snake.pop();
+  }
+
+  drawSnake();
+}
+
+function drawSnake() {
+  snakeCtx.fillStyle = "#020617";
+  snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+  if (food) {
+    snakeCtx.fillStyle = "#22c55e";
+    snakeCtx.fillRect(
+      food.x * tileSize,
+      food.y * tileSize,
+      tileSize,
+      tileSize
+    );
+  }
+
+  snakeCtx.fillStyle = "#3b82f6";
+  snake.forEach((seg, index) => {
+    snakeCtx.fillRect(
+      seg.x * tileSize,
+      seg.y * tileSize,
+      tileSize - 1,
+      tileSize - 1
+    );
+  });
+}
+
+function gameOverSnake() {
+  if (snakeInterval) {
+    clearInterval(snakeInterval);
+    snakeInterval = null;
+  }
+  snakeCtx.fillStyle = "rgba(15,23,42,0.7)";
+  snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+  snakeCtx.fillStyle = "#e5e7eb";
+  snakeCtx.font = "20px system-ui";
+  snakeCtx.textAlign = "center";
+  snakeCtx.fillText("Game Over", snakeCanvas.width / 2, snakeCanvas.height / 2 - 10);
+  snakeCtx.font = "14px system-ui";
+  snakeCtx.fillText(
+    `Score : ${snakeScore} — appuie sur Échap pour fermer`,
+    snakeCanvas.width / 2,
+    snakeCanvas.height / 2 + 14
+  );
+}
+
+// gestion des touches pour Snake + code secret
+window.addEventListener("keydown", (e) => {
+  // priorité au Snake si actif
+  if (snakeActive) {
+    handleSnakeKey(e);
+    return;
+  }
+
+  // sinon, on écoute la séquence secrète "nird"
+  if (e.key.length === 1) {
+    secretBuffer += e.key.toLowerCase();
+    if (secretBuffer.length > secretCode.length) {
+      secretBuffer = secretBuffer.slice(-secretCode.length);
+    }
+    if (secretBuffer === secretCode) {
+      startSnakeGame();
+    }
+  }
+});
+
+function handleSnakeKey(e) {
+  if (!snakeActive) return;
+
+  if (e.key === "Escape") {
+    stopSnakeGame();
+    return;
+  }
+
+  const key = e.key;
+
+  if (key === "ArrowUp" && snakeDir.y !== 1) {
+    pendingDir = { x: 0, y: -1 };
+  } else if (key === "ArrowDown" && snakeDir.y !== -1) {
+    pendingDir = { x: 0, y: 1 };
+  } else if (key === "ArrowLeft" && snakeDir.x !== 1) {
+    pendingDir = { x: -1, y: 0 };
+  } else if (key === "ArrowRight" && snakeDir.x !== -1) {
+    pendingDir = { x: 1, y: 0 };
+  }
+}
+
+// bouton pour fermer l’overlay
+snakeCloseBtn.addEventListener("click", () => {
+  stopSnakeGame();
+});

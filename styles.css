@@ -188,3 +188,67 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Overlay Snake caché --- */
+
+#snake-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.9);
+  display: flex; /* on laisse flex */
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+/* 👇 IMPORTANT : ceci force le display:none quand la classe hidden est présente */
+#snake-overlay.hidden {
+  display: none;
+}
+
+#snake-panel {
+  background: #020617;
+  border-radius: 16px;
+  padding: 16px 18px 20px;
+  border: 1px solid #1f2937;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+}
+
+.snake-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+#snake-close {
+  background: transparent;
+  border-radius: 999px;
+  border: 1px solid #374151;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+#snake-canvas {
+  background: #020617;
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+  display: block;
+  margin: 4px auto 10px;
+}
+
+#snake-instructions {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+#snake-score {
+  font-size: 0.9rem;
+  color: #e5e7eb;
+}
